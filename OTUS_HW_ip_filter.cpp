@@ -1,6 +1,6 @@
 // OTUS_HW_ip_filter.cpp : Defines the entry point for the console application.
 //
-#include "stdafx.h"
+//#include "stdafx.h"
 
 #include <cassert>
 #include <cstdlib>
