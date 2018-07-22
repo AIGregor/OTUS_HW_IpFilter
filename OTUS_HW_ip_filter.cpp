@@ -1,40 +1,67 @@
 // OTUS_HW_ip_filter.cpp : Defines the entry point for the console application.
 //
+
 //#include "stdafx.h"
 
-#include <cassert>
-#include <cstdlib>
+//#include <cassert>
+//#include <cstdlib>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <stdarg.h>
 
 using namespace std;
 
 using ip_string = std::vector<std::string>;
-using ip_vector = std::vector< ip_string >;
+using ip_int = std::vector<int>;
+using ip_vector = std::vector< ip_int >;
 
-ip_string split(const std::string &str, char d)
+template <typename T>
+std::vector<T> split(const std::string &str, char d)
 {
-	ip_string r;
+	std::vector<T> r;
 
 	std::string::size_type start = 0;
 	std::string::size_type stop = str.find_first_of(d);
 	while (stop != std::string::npos)
 	{
-		r.push_back(str.substr(start, stop - start));
+		r.push_back(
+			ConvertString<T>(str.substr(start, stop - start))
+		);
 
 		start = stop + 1;
 		stop = str.find_first_of(d, start);
 	}
-
-	r.push_back(str.substr(start));
+	r.push_back(
+		ConvertString<T>(str.substr(start))
+	);
 
 	return r;
 }
 
-void printIpString(const ip_string& ip)
+template <typename T>
+T ConvertString(const std::string &data)
+{
+	if (!data.empty())
+	{
+		T ret;
+		std::istringstream iss(data);
+		if (data.find("0x") != std::string::npos)
+			iss >> std::hex >> ret;
+		else
+			iss >> std::dec >> ret;
+
+		if (iss.fail())
+		{
+			return T();
+		}
+		return ret;
+	}
+	return T();
+}
+
+void printIpString(const ip_int& ip)
 {
 	size_t szCount = 0;
 	for (const auto ip_part : ip)
@@ -62,7 +89,7 @@ void printIpList(const ip_vector& ip_pool, const short int firstByte)
 {
 	for (const auto ip : ip_pool)
 	{
-		if (firstByte == stoi(ip[0]))
+		if (firstByte == ip[0])
 		{
 			printIpString(ip);
 		}
@@ -73,8 +100,8 @@ void printIpList(const ip_vector& ip_pool, const short int firstByte, const shor
 {
 	for (const auto ip : ip_pool)
 	{
-		if (firstByte == stoi(ip[0]) &&
-			secondByte == stoi(ip[1]))
+		if (firstByte == ip[0] &&
+			secondByte == ip[1])
 		{
 			printIpString(ip);
 		}
@@ -85,10 +112,10 @@ void printIpList_any(const ip_vector& ip_pool, const short int anyByte)
 {
 	for (const auto ip : ip_pool)
 	{
-		if (anyByte == stoi(ip[0]) ||
-			anyByte == stoi(ip[1]) || 
-			anyByte == stoi(ip[2]) || 
-			anyByte == stoi(ip[3]))
+		if (anyByte == ip[0] ||
+			anyByte == ip[1] || 
+			anyByte == ip[2] || 
+			anyByte == ip[3])
 		{
 			printIpString(ip);
 		}
@@ -103,19 +130,21 @@ int main(int argc, char const *argv[])
 
 		for (std::string line; std::getline(std::cin, line);)
 		{
-			ip_string v = split(line, '\t');
-			ip_pool.push_back(split(v.at(0), '.'));
+			ip_string v = split<string>(line, '\t');
+			ip_int ip = split<int>(v.at(0), '.');
+
+			ip_pool.push_back(ip);
 		}
 
 		// TODO reverse lexicographically sort
 		struct {
-			bool operator()(ip_string a, ip_string b) const
+			bool operator()(ip_int a, ip_int b) const
 			{
 				bool res = false;
 				for (size_t i = 0; i < a.size(); ++i)
 				{
-					int ip1_byte = stoi(a[i]);
-					int ip2_byte = stoi(b[i]);
+					int ip1_byte = a[i];
+					int ip2_byte = b[i];
 				
 					if (ip1_byte > ip2_byte)
 					{
