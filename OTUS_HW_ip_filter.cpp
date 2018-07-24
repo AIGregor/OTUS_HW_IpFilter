@@ -1,7 +1,7 @@
 // OTUS_HW_ip_filter.cpp : Defines the entry point for the console application.
 //
 
-//#include "stdafx.h"
+#include "stdafx.h"
 
 //#include <cassert>
 //#include <cstdlib>
@@ -47,10 +47,7 @@ T ConvertString(const std::string &data)
 	{
 		T ret;
 		std::istringstream iss(data);
-		if (data.find("0x") != std::string::npos)
-			iss >> std::hex >> ret;
-		else
-			iss >> std::dec >> ret;
+		iss >> std::dec >> ret;
 
 		if (iss.fail())
 		{
@@ -64,7 +61,7 @@ T ConvertString(const std::string &data)
 void printIpString(const ip_int& ip)
 {
 	size_t szCount = 0;
-	for (const auto ip_part : ip)
+	for (const auto& ip_part : ip)
 	{
 		std::cout << ip_part;
 		++szCount;
@@ -79,7 +76,7 @@ void printIpString(const ip_int& ip)
 
 void printIpList(const ip_vector& ip_pool)
 {
-	for (const auto ip : ip_pool)
+	for (const auto& ip : ip_pool)
 	{
 		printIpString(ip);
 	}
@@ -87,7 +84,7 @@ void printIpList(const ip_vector& ip_pool)
 
 void printIpList(const ip_vector& ip_pool, const short int firstByte)
 {
-	for (const auto ip : ip_pool)
+	for (const auto& ip : ip_pool)
 	{
 		if (firstByte == ip[0])
 		{
@@ -98,7 +95,7 @@ void printIpList(const ip_vector& ip_pool, const short int firstByte)
 
 void printIpList(const ip_vector& ip_pool, const short int firstByte, const short int secondByte)
 {
-	for (const auto ip : ip_pool)
+	for (const auto& ip : ip_pool)
 	{
 		if (firstByte == ip[0] &&
 			secondByte == ip[1])
@@ -137,30 +134,17 @@ int main(int argc, char const *argv[])
 		}
 
 		// TODO reverse lexicographically sort
-		struct {
-			bool operator()(ip_int a, ip_int b) const
-			{
-				bool res = false;
-				for (size_t i = 0; i < a.size(); ++i)
+		std::sort(ip_pool.begin(), ip_pool.end(), 
+			[](const ip_int& a,const ip_int& b) {				
+				int i = 0;
+				int size = a.size() - 1;
+				while (i < size && a[i] == b[i])
 				{
-					int ip1_byte = a[i];
-					int ip2_byte = b[i];
-				
-					if (ip1_byte > ip2_byte)
-					{
-						res = true;
-						break;
-					}
-					else if(ip1_byte < ip2_byte)
-					{
-						res = false;
-						break;
-					}
-				}					
-				return res;
+					++i;
+				}
+				return a[i] > b[i];
 			}
-		} ipSort;
-		std::sort(ip_pool.begin(), ip_pool.end(), ipSort);
+		);
 		
 		// Sorted vector
 		printIpList(ip_pool);
