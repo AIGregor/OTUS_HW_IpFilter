@@ -27,21 +27,21 @@ std::vector<T> split(const std::string &str, char d)
 	while (stop != std::string::npos)
 	{
 		r.push_back(
-			ConvertString<T>(str.substr(start, stop - start))
+			convertString<T>(str.substr(start, stop - start))
 		);
 
 		start = stop + 1;
 		stop = str.find_first_of(d, start);
 	}
 	r.push_back(
-		ConvertString<T>(str.substr(start))
+		convertString<T>(str.substr(start))
 	);
 
 	return r;
 }
 
 template <typename T>
-T ConvertString(const std::string &data)
+T convertString(const std::string &data)
 {
 	if (!data.empty())
 	{
@@ -107,7 +107,7 @@ void printIpList(const ip_vector& ip_pool, const short int firstByte, const shor
 
 void printIpList_any(const ip_vector& ip_pool, const short int anyByte)
 {
-	for (const auto ip : ip_pool)
+	for (const auto& ip : ip_pool)
 	{
 		if (anyByte == ip[0] ||
 			anyByte == ip[1] || 
