@@ -14,29 +14,6 @@ using ip_int = std::vector<int>;
 using ip_vector = std::vector< ip_int >;
 
 template <typename T>
-std::vector<T> split(const std::string &str, char d)
-{
-	std::vector<T> r;
-
-	std::string::size_type start = 0;
-	std::string::size_type stop = str.find_first_of(d);
-	while (stop != std::string::npos)
-	{
-		r.push_back(
-			convertString<T>(str.substr(start, stop - start))
-		);
-
-		start = stop + 1;
-		stop = str.find_first_of(d, start);
-	}
-	r.push_back(
-		convertString<T>(str.substr(start))
-	);
-
-	return r;
-}
-
-template <typename T>
 T convertString(const std::string &data)
 {
 	if (!data.empty())
@@ -113,6 +90,29 @@ void printIpList_any(const ip_vector& ip_pool, const short int anyByte)
 			printIpString(ip);
 		}
 	}
+}
+
+template <typename T>
+std::vector<T> split(const std::string &str, char d)
+{
+	std::vector<T> r;
+
+	std::string::size_type start = 0;
+	std::string::size_type stop = str.find_first_of(d);
+	while (stop != std::string::npos)
+	{
+		r.push_back(
+			convertString<T>(str.substr(start, stop - start))
+		);
+
+		start = stop + 1;
+		stop = str.find_first_of(d, start);
+	}
+	r.push_back(
+		convertString<T>(str.substr(start))
+	);
+
+	return r;
 }
 
 int main(int argc, char const *argv[])
